@@ -18,6 +18,7 @@ describe("parseAmount", () => {
     ["12.00-", -1200],
     ["  1 234.00 ", 123400],
     ["৳500", 50000],
+    ["1\u00a0234.00", 123400],
   ])("parses %j as %i cents", (input, cents) => {
     expect(parseAmount(input)).toBe(cents);
   });

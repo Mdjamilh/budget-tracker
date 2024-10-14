@@ -13,7 +13,8 @@ const CURRENCY = /^[$€£¥₹৳]|[$€£¥₹৳]$/g;
  * including ambiguous signs such as "--5" or "(-5)".
  */
 export function parseAmount(input: string): Cents | undefined {
-  let text = input.trim().replace(/[\s ]/g, "");
+  // \s also matches non-breaking spaces, which some banks use as thousands separators.
+  let text = input.trim().replace(/\s/g, "");
   if (!text) return undefined;
 
   let signs = 0;
