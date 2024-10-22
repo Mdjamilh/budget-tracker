@@ -6,13 +6,14 @@ import { MonthProvider } from "./components/month";
 import { Shell } from "./components/Shell";
 import { db } from "./data/db";
 import { runRecurring, seedCategories } from "./data/repo";
+import { OverviewPage } from "./pages/OverviewPage";
 import { today } from "./lib/dates";
 
 // Hash routes work offline from the service worker cache and on any static host.
 const router = createHashRouter([
   {
     element: <Shell />,
-    children: [{ index: true, element: <p>Overview</p> }],
+    children: [{ index: true, element: <OverviewPage /> }],
   },
 ]);
 
