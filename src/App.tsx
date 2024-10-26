@@ -6,6 +6,7 @@ import { MonthProvider } from "./components/month";
 import { Shell } from "./components/Shell";
 import { db } from "./data/db";
 import { runRecurring, seedCategories } from "./data/repo";
+import { BudgetsPage } from "./pages/BudgetsPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { today } from "./lib/dates";
@@ -17,6 +18,7 @@ const router = createHashRouter([
     children: [
       { index: true, element: <OverviewPage /> },
       { path: "transactions", element: <TransactionsPage /> },
+      { path: "budgets", element: <BudgetsPage /> },
     ],
   },
 ]);
