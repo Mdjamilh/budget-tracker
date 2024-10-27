@@ -64,12 +64,19 @@ export function parseDate(value: string, format: DateFormat): string | undefined
 }
 
 /**
- * The first format every sample parses in. "03/04/2026" fits both US and
- * day-first formats, so a later "13/04/2026" is what settles it.
+ * The format that reads the most samples. "03/04/2026" fits both US and
+ * day-first formats, so a later "13/04/2026" is what settles it. Counting
+ * instead of requiring every row means one bad date in a file (a bank's
+ * "31/09") doesn't throw the whole guess off. Ties go to the earlier format.
  */
 export function guessDateFormat(samples: string[]): DateFormat | undefined {
   const values = samples.filter((s) => s.trim());
-  return DATE_FORMATS.find((f) => values.length > 0 && values.every((v) => parseDate(v, f)));
+  let best: { format: DateFormat; hits: number } | undefined;
+  for (const format of DATE_FORMATS) {
+    const hits = values.filter((v) => parseDate(v, format)).length;
+    if (hits > 0 && hits > (best?.hits ?? 0)) best = { format, hits };
+  }
+  return best?.format;
 }
 
 export const normalizeDescription = (text: string) => text.toLowerCase().replace(/\s+/g, " ").trim();

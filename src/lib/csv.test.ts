@@ -19,7 +19,8 @@ describe("reading a bank export", () => {
     expect(table.headers).toEqual(["Transaction Date", "Description", "Amount", "Balance"]);
     const mapping = guessMapping(table.headers);
     expect(mapping).toEqual({ date: 0, description: 1, amount: 2 });
-    expect(guessDateFormat(dataRows(table).map((r) => r[0]!))).toBeUndefined(); // "2026-04-31" doesn't exist
+    // "2026-04-31" doesn't exist, but the rest of the file settles the format.
+    expect(guessDateFormat(dataRows(table).map((r) => r[0]!))).toBe("YYYY-MM-DD");
 
     const { rows, errors } = toTransactions(table, mapping, "YYYY-MM-DD");
     expect(rows.map((r) => [r.date, r.description, r.amount])).toEqual([
@@ -76,6 +77,9 @@ describe("parseDate", () => {
     expect(guessDateFormat(["2026-01-02", "2026-01-30"])).toBe("YYYY-MM-DD");
     expect(guessDateFormat(["01/02/2026", "01/30/2026"])).toBe("MM/DD/YYYY");
     expect(guessDateFormat([])).toBeUndefined();
+    expect(guessDateFormat(["nonsense"])).toBeUndefined();
+    // One impossible date doesn't hide an otherwise clear day-first file.
+    expect(guessDateFormat(["03/10/2026", "14/10/2026", "31/09/2026"])).toBe("DD/MM/YYYY");
   });
 });
 
