@@ -7,6 +7,7 @@ import { Shell } from "./components/Shell";
 import { db } from "./data/db";
 import { runRecurring, seedCategories } from "./data/repo";
 import { BudgetsPage } from "./pages/BudgetsPage";
+import { ImportPage } from "./pages/ImportPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { RecurringPage } from "./pages/RecurringPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
@@ -21,6 +22,7 @@ const router = createHashRouter([
       { path: "transactions", element: <TransactionsPage /> },
       { path: "budgets", element: <BudgetsPage /> },
       { path: "recurring", element: <RecurringPage /> },
+      { path: "import", element: <ImportPage /> },
     ],
   },
 ]);
