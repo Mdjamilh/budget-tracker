@@ -12,18 +12,10 @@ import { useCategories, useTransactions } from "../data/hooks";
 import { deleteTransactions, restoreTransactions, updateTransaction } from "../data/repo";
 import { toCsv } from "../lib/csv";
 import { formatDay } from "../lib/dates";
+import { download } from "../lib/download";
 import { filterTransactions } from "../lib/filter";
 import { formatMoney, sum } from "../lib/money";
 import type { Transaction } from "../lib/types";
-
-function download(name: string, text: string, type: string) {
-  const url = URL.createObjectURL(new Blob([text], { type }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = name;
-  link.click();
-  URL.revokeObjectURL(url);
-}
 
 export function TransactionsPage() {
   const { month } = useMonth();
