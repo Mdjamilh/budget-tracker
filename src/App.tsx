@@ -10,6 +10,7 @@ import { BudgetsPage } from "./pages/BudgetsPage";
 import { ImportPage } from "./pages/ImportPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { RecurringPage } from "./pages/RecurringPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { today } from "./lib/dates";
 
@@ -23,6 +24,7 @@ const router = createHashRouter([
       { path: "budgets", element: <BudgetsPage /> },
       { path: "recurring", element: <RecurringPage /> },
       { path: "import", element: <ImportPage /> },
+      { path: "settings", element: <SettingsPage /> },
     ],
   },
 ]);
