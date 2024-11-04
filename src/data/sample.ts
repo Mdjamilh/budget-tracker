@@ -61,7 +61,11 @@ export function sampleTransactions(categoryIds: Record<string, string>, todayDat
   return out.sort((a, b) => a.date.localeCompare(b.date));
 }
 
-/** Loads sample categories, budgets, transactions and two recurring rules. */
+/**
+ * Loads sample categories, budgets, transactions and two recurring rules.
+ * Safe to run twice: sample rows carry import keys and rules are matched by
+ * description, so nothing is duplicated.
+ */
 export async function loadSampleData(db: BudgetDB, todayDate: string): Promise<number> {
   await seedCategories(db);
   return db.transaction("rw", db.categories, db.transactions, db.recurring, async () => {
@@ -70,8 +74,10 @@ export async function loadSampleData(db: BudgetDB, todayDate: string): Promise<n
     await db.categories.bulkPut(categories.map((c): Category => (BUDGETS[c.name] ? { ...c, budget: BUDGETS[c.name]! } : c)));
 
     const now = Date.now();
-    const drafts = sampleTransactions(ids, todayDate);
-    await db.transactions.bulkAdd(drafts.map((d, i) => ({ ...d, id: newId(), createdAt: now + i })));
+    const drafts = sampleTransactions(ids, todayDate).map((d, i) => ({ ...d, importKey: `sample|${d.date}|${i}` }));
+    const existing = new Set((await db.transactions.where("importKey").anyOf(drafts.map((d) => d.importKey)).toArray()).map((t) => t.importKey));
+    const fresh = drafts.filter((d) => !existing.has(d.importKey));
+    await db.transactions.bulkAdd(fresh.map((d, i) => ({ ...d, id: newId(), createdAt: now + i })));
 
     const current = monthOf(todayDate);
     const rules: RecurringRule[] = [
@@ -87,7 +93,8 @@ export async function loadSampleData(db: BudgetDB, todayDate: string): Promise<n
         lastGenerated: todayDate >= dateInMonth(current, 28) ? current : addMonths(current, -1),
       },
     ];
-    await db.recurring.bulkAdd(rules);
-    return drafts.length;
+    const known = new Set((await db.recurring.toArray()).map((r) => r.description));
+    await db.recurring.bulkAdd(rules.filter((r) => !known.has(r.description)));
+    return fresh.length;
   });
 }

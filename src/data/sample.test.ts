@@ -28,6 +28,11 @@ describe("sample data", () => {
     expect(await runRecurring(db, "2026-10-15")).toBe(0);
     expect(await runRecurring(db, "2026-10-28")).toBe(1); // this month's pay arrives on the 28th
 
+    // Loading again adds nothing.
+    expect(await loadSampleData(db, "2026-10-15")).toBe(0);
+    expect(await db.transactions.count()).toBe(count + 1);
+    expect(await db.recurring.count()).toBe(2);
+
     const summary = summarizeMonth(await db.transactions.toArray(), await db.categories.toArray(), "2026-09", "2026-10-15");
     expect(summary.income).toBeGreaterThan(400000);
     expect(summary.budgeted).toBeGreaterThan(0);
