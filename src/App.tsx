@@ -4,27 +4,23 @@ import { createHashRouter, RouterProvider } from "react-router";
 
 import { MonthProvider } from "./components/month";
 import { Shell } from "./components/Shell";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 import { db } from "./data/db";
 import { runRecurring, seedCategories } from "./data/repo";
-import { BudgetsPage } from "./pages/BudgetsPage";
-import { ImportPage } from "./pages/ImportPage";
-import { OverviewPage } from "./pages/OverviewPage";
-import { RecurringPage } from "./pages/RecurringPage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { TransactionsPage } from "./pages/TransactionsPage";
 import { today } from "./lib/dates";
 
 // Hash routes work offline from the service worker cache and on any static host.
+// Each page is its own chunk, so the charts only load on the overview.
 const router = createHashRouter([
   {
     element: <Shell />,
     children: [
-      { index: true, element: <OverviewPage /> },
-      { path: "transactions", element: <TransactionsPage /> },
-      { path: "budgets", element: <BudgetsPage /> },
-      { path: "recurring", element: <RecurringPage /> },
-      { path: "import", element: <ImportPage /> },
-      { path: "settings", element: <SettingsPage /> },
+      { index: true, lazy: () => import("./pages/OverviewPage").then((m) => ({ Component: m.OverviewPage })) },
+      { path: "transactions", lazy: () => import("./pages/TransactionsPage").then((m) => ({ Component: m.TransactionsPage })) },
+      { path: "budgets", lazy: () => import("./pages/BudgetsPage").then((m) => ({ Component: m.BudgetsPage })) },
+      { path: "recurring", lazy: () => import("./pages/RecurringPage").then((m) => ({ Component: m.RecurringPage })) },
+      { path: "import", lazy: () => import("./pages/ImportPage").then((m) => ({ Component: m.ImportPage })) },
+      { path: "settings", lazy: () => import("./pages/SettingsPage").then((m) => ({ Component: m.SettingsPage })) },
     ],
   },
 ]);
@@ -43,6 +39,7 @@ export default function App() {
   return (
     <MonthProvider>
       <RouterProvider router={router} />
+      <UpdatePrompt />
     </MonthProvider>
   );
 }
