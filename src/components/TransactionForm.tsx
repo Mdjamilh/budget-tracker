@@ -3,7 +3,7 @@ import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 
 import { db } from "../data/db";
-import { useCategories, useTransactions } from "../data/hooks";
+import { useCategories } from "../data/hooks";
 import { addTransaction, updateTransaction } from "../data/repo";
 import { suggestCategory } from "../lib/categorize";
 import { today } from "../lib/dates";
@@ -24,7 +24,6 @@ const fromTransaction = (t?: Transaction): Values => ({
 /** Add or edit one transaction. Amounts are typed as positive numbers; the toggle sets the direction. */
 export function TransactionForm({ opened, onClose, transaction }: { opened: boolean; onClose: () => void; transaction?: Transaction }) {
   const categories = useCategories() ?? [];
-  const history = useTransactions() ?? [];
   const form = useForm<Values>({
     mode: "controlled",
     initialValues: fromTransaction(transaction),
@@ -81,12 +80,13 @@ export function TransactionForm({ opened, onClose, transaction }: { opened: bool
             label="Description"
             placeholder="e.g. Fresh Market"
             {...form.getInputProps("description")}
-            onBlur={(e) => {
+            onBlur={async (e) => {
               // Suggest the category used last time for this merchant, if none is chosen yet.
-              if (!form.getValues().categoryId) {
-                const suggestion = suggestCategory(e.currentTarget.value, history);
-                if (suggestion && options.some((o) => o.value === suggestion)) form.setFieldValue("categoryId", suggestion);
-              }
+              // Read history at this moment rather than from a subscription that may still be loading.
+              const description = e.currentTarget.value;
+              if (form.getValues().categoryId || !description.trim()) return;
+              const suggestion = suggestCategory(description, await db.transactions.toArray());
+              if (suggestion && options.some((o) => o.value === suggestion)) form.setFieldValue("categoryId", suggestion);
             }}
           />
           <Select label="Category" placeholder="Uncategorized" data={options} clearable searchable {...form.getInputProps("categoryId")} />
