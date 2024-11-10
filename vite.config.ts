@@ -25,6 +25,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Take control on the very first visit, so the app works offline
+        // without a reload. Updates still wait for the user (prompt mode).
+        clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
         runtimeCaching: [
           {
