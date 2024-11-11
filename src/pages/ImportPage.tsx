@@ -63,7 +63,14 @@ export function ImportPage() {
       notifications.show({
         color: "mint",
         title: `Imported ${added} ${added === 1 ? "transaction" : "transactions"}`,
-        message: [duplicates && `${duplicates} already imported, skipped.`, categorized && `${categorized} categorized from your history.`].filter(Boolean).join(" ") || "Nothing was skipped.",
+        message:
+          [
+            duplicates && `${duplicates} already imported, skipped.`,
+            result.errors.length && `${result.errors.length} ${result.errors.length === 1 ? "row" : "rows"} with problems skipped.`,
+            categorized && `${categorized} categorized from your history.`,
+          ]
+            .filter(Boolean)
+            .join(" ") || "Nothing was skipped.",
       });
       const latest = result.rows.map((r) => r.date).sort().at(-1);
       if (latest) setMonth(monthOf(latest));
