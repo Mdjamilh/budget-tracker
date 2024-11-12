@@ -22,7 +22,7 @@ const STATUS: Record<BudgetStatus, { color: string; label: string }> = {
 
 function Stat({ label, value, hint, color }: { label: string; value: string; hint?: string; color?: string }) {
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder p="md" radius="md" role="group" aria-label={label}>
       <Text size="sm" c="dimmed">
         {label}
       </Text>
