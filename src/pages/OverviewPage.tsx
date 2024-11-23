@@ -48,13 +48,14 @@ function BudgetRow({ row }: { row: CategorySpend }) {
           <span style={{ width: 10, height: 10, borderRadius: 999, background: `var(--mantine-color-${row.category.color}-6)` }} />
           <Text fw={500}>{row.category.name}</Text>
           {row.status !== "ok" && row.status !== "none" && (
-            <Badge size="sm" variant="light" color={status.color}>
+            // The bar and the "over" line carry the same message on small screens.
+            <Badge size="sm" variant="light" color={status.color} visibleFrom="sm">
               {status.label}
             </Badge>
           )}
         </Group>
         <Text size="sm" ff="monospace" ta="right">
-          {formatMoney(row.spent)}
+          {formatMoney(Math.max(0, row.spent))}
           {row.budget > 0 && <Text span c="dimmed"> / {formatMoney(row.budget)}</Text>}
         </Text>
       </Group>
@@ -62,9 +63,15 @@ function BudgetRow({ row }: { row: CategorySpend }) {
         <>
           <Progress value={used} color={status.color} size="md" aria-label={`${row.category.name}: ${percent(row.spent, row.budget)}% of budget used`} />
           <Text size="xs" c={row.remaining < 0 ? "red" : "dimmed"} mt={2}>
-            {row.remaining < 0 ? `${formatMoney(-row.remaining)} over` : `${formatMoney(row.remaining)} left`}
+            {row.remaining < 0 ? `${formatMoney(-row.remaining)} over` : `${formatMoney(Math.min(row.remaining, row.budget))} left`}
           </Text>
         </>
+      )}
+      {/* Refunds for earlier purchases can outweigh this month's spending. */}
+      {row.spent < 0 && (
+        <Text size="xs" c="mint.7" mt={2}>
+          {formatMoney(-row.spent)} more refunded than spent
+        </Text>
       )}
     </div>
   );
