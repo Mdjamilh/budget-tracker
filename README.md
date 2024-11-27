@@ -21,7 +21,7 @@ A budget tracker that keeps your finances on your own device. There's no account
 
 ## Why it works this way
 
-**Why no server?** Bank transactions are some of the most personal data there is. Here everything is stored in the browser's IndexedDB. Import files are read in the browser and never uploaded, and the app makes no API calls. The trade-off is that your data lives in one browser, which is why backup and restore are on the Settings page.
+**Why no server?** Bank transactions are some of the most personal data there is. Here everything is stored in the browser's IndexedDB. Import files are read in the browser and never uploaded. Apart from fetching its fonts, the app makes no network requests. The trade-off is that your data lives in one browser, which is why backup and restore are on the Settings page.
 
 **Why are amounts stored as whole cents?** `0.1 + 0.2` isn't `0.3` in floating point. Every amount is an integer number of cents from the moment it's parsed, so totals can't drift. The parser also handles what real bank exports contain: `1,234.56`, `(12.00)` for a negative, `12.00-`, non-breaking spaces as thousands separators, and currency symbols. It rejects anything ambiguous, such as `--5`.
 
